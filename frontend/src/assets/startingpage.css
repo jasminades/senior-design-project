@@ -1,0 +1,146 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, .app {
+  font-family: "Poppins", sans-serif;
+  color: #1a1a1a;
+  background: linear-gradient(to right, #fffdf9, #faf8ff);
+  min-height: 100vh;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem 5rem;
+}
+
+.logo {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #b3a7f5;
+}
+
+.logo span {
+  color: #7f73ef;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+}
+
+nav li {
+  font-size: 1rem;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+nav li:hover {
+  color: #7f73ef;
+}
+
+.contact-btn {
+  border: 1px solid #d4caff;
+  background: transparent;
+  color: #7f73ef;
+  padding: 0.7rem 1.4rem;
+  border-radius: 2rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.contact-btn:hover {
+  background: #7f73ef;
+  color: white;
+}
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4rem 5rem;
+}
+
+.hero-text {
+  max-width: 50%;
+}
+
+.hero-text h1 {
+  font-size: 3rem;
+  line-height: 1.2;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.ready {
+  font-size: 0.9rem;
+  color: #7f73ef;
+  background: #f3f0ff;
+  padding: 0.4rem 0.8rem;
+  border-radius: 1rem;
+  display: inline-block;
+  margin-bottom: 1.5rem;
+}
+
+.profiles {
+  display: flex;
+  gap: -10px;
+  margin-bottom: 1rem;
+}
+
+.profiles img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid white;
+  margin-right: -10px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+.description {
+  color: #6a6a6a;
+  margin-bottom: 2rem;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.start-btn {
+  background: #b79df8;
+  border: none;
+  color: white;
+  padding: 0.9rem 1.8rem;
+  border-radius: 2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.start-btn:hover {
+  background: #a186f7;
+}
+
+.watch-btn {
+  border: none;
+  background: transparent;
+  color: #7f73ef;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.hero-image img {
+  width: 400px;
+  border-radius: 1rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
