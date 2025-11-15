@@ -11,22 +11,18 @@ import uuid
 app = Flask(__name__)
 CORS(app)
 
-MODEL_PATH = "/Users/jasmina/Desktop/faks/diplomski/backend/src/checkpoints/test_model.keras"
+MODEL_PATH = ""
 UPLOAD_FOLDER = "uploads"
 HEATMAP_FOLDER = "heatmaps"
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(HEATMAP_FOLDER, exist_ok=True)
 
-model = tf.keras.models.load_model("/Users/jasmina/Desktop/faks/diplomski/backend/src/checkpoints/test_model.keras")
+model = tf.keras.models.load_model("")
 
 
 dummy = np.zeros((1, 64, 64, 3), dtype=np.float32)
 _ = model(dummy, training=False)
-
-print("Model initialized.")
-print("=========================\n")
-
 
 def generate_gradcam(model, img_array, last_conv_layer_name="conv2d_2"):
 
