@@ -7,18 +7,28 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 import cv2
 import uuid
+import mysql.connector
+
+db = mysql.connector.connect(
+    host="",
+    user="",
+    password="",
+    database=""
+)
+cursor = db.cursor(dictionary=True)
+
 
 app = Flask(__name__)
 CORS(app)
 
-MODEL_PATH = ""
+MODEL_PATH = "../checkpoints/test_model.keras"
 UPLOAD_FOLDER = "uploads"
 HEATMAP_FOLDER = "heatmaps"
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(HEATMAP_FOLDER, exist_ok=True)
 
-model = tf.keras.models.load_model("")
+model = tf.keras.models.load_model("../checkpoints/test_model.keras")
 
 
 dummy = np.zeros((1, 64, 64, 3), dtype=np.float32)
@@ -84,7 +94,7 @@ def predict():
         preds = model.predict(img_array)
 
         predicted_class = int(np.argmax(preds[0]))
-        confidence = float(np.max(preds[0]))
+        confidence = float(np.max(preds[0]) * 100)
 
         labels = ["Non-Demented", "Very Mild Demented", "Mild Demented", "Moderate Demented"]
         predicted_label = labels[predicted_class]
@@ -105,7 +115,37 @@ def predict():
         heatmap_path = os.path.join(HEATMAP_FOLDER, heatmap_filename)
         cv2.imwrite(heatmap_path, superimposed_img)
 
+        cursor = db.cursor()
+
+        cursor.execute("""
+            INSERT INTO predictions (user_id, prediction_label, prediction_confidence,
+                                    original_image_path, heatmap_image_path, model_version)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (
+            request.form.get("user_id"),
+            predicted_label,
+            confidence,  
+            filepath,
+            heatmap_path,
+            "v1.0"
+        ))
+
+        db.commit()
+        prediction_id = cursor.lastrowid
+    
+        cursor.execute("""
+            INSERT INTO analysis_results (user_id, prediction, confidence)
+            VALUES (%s, %s, %s)
+        """, (
+            request.form.get("user_id"),
+            predicted_label,
+            confidence,
+        ))
+
+        db.commit()
+
         return jsonify({
+            "prediction_id": prediction_id,
             "prediction": predicted_label,
             "confidence": confidence,
             "image_path": filepath,
@@ -151,6 +191,18 @@ def get_prediction_details(prediction_id):
         return jsonify({"error": "Prediction not found"}), 404
 
     return jsonify(pred)
+
+
+from flask import send_from_directory
+
+@app.route('/uploads/<path:filename>')
+def serve_uploads(filename):
+    return send_from_directory('uploads', filename)
+
+@app.route('/heatmaps/<path:filename>')
+def serve_heatmaps(filename):
+    return send_from_directory('heatmaps', filename)
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5001, debug=True)
