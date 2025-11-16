@@ -3,7 +3,9 @@
     <header class="navbar">
       <div class="logo">neuro<span>scan</span></div>
       <div class="nav-buttons">
-        <v-btn text class="nav-text-btn" @click="$router.push({ name: 'Dashboard' })">Back to Dashboard</v-btn>
+        <v-btn text class="nav-text-btn" @click="$router.push({ name: 'Dashboard' })">
+          Back to Dashboard
+        </v-btn>
         <v-btn text class="nav-text-btn logout-btn" @click="logout">Logout</v-btn>
       </div>
     </header>
@@ -14,13 +16,9 @@
         <p class="card-subtitle mb-4">
           Below is your analysis history. Each record includes the MRI upload date,
           AI prediction, and confidence score.
+
         </p>
-
-        <v-card class="history-card pa-4 mt-4">
-        <div class="v-card-title text-h6 font-weight-bold mb-2">Previous Uploads</div>
         <history-table :history="history" />
-      </v-card>
-
       </v-card>
     </section>
   </div>
@@ -39,25 +37,42 @@ export default {
     };
   },
   async mounted() {
-    const userId = localStorage.getItem("user_id");
-    if (!userId) {
-      this.$router.push({ name: "Login" });
-      return;
-    }
-    try {
-      const response = await axios.get(`http://localhost:5001/history/${userId}`);
-      this.history = response.data.map(r => ({
-        date: r.date,
-        prediction: r.prediction,
-        confidence: r.confidence / 100,
-      }));
-    } catch (err) {
-      console.error("Error fetching history:", err);
-    }
+    await this.fetchHistory();
   },
   methods: {
     logout() {
       this.$router.push({ name: "Login" });
+    },
+    async fetchHistory() {
+      const userId = localStorage.getItem("user_id");
+      if (!userId) return;
+
+      try {
+        const response = await axios.get(`http://localhost:5001/history/${userId}`);
+        this.history = response.data.map(r => ({
+          date: r.date,
+          prediction: r.prediction,
+          confidence: r.confidence,
+        }));
+      } catch (err) {
+        console.error("Error fetching history:", err);
+      }
+    },
+    async runDummyAnalysis() {
+      const userId = localStorage.getItem("user_id");
+      if (!userId) return;
+
+      try {
+        const formData = new FormData();
+        formData.append("user_id", userId);
+
+        const response = await axios.post("http://localhost:5001/predict", formData);
+        console.log("Prediction result:", response.data);
+
+        await this.fetchHistory();
+      } catch (err) {
+        console.error("Error running analysis:", err);
+      }
     },
   },
 };
