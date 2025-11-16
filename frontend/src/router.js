@@ -13,7 +13,7 @@ const routes = [
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
   { path: '/profile', name: 'Profile', component: Profile },
   { path: '/start', name: 'Starting Page', component: StartingPage },
-  { path: '/predictions', name: 'Prediction Details', component: PredictionsDetails },
+  { path: '/predictions/:id', name: 'PredictionDetails', component: PredictionsDetails },
 ]
 
 const router = createRouter({
