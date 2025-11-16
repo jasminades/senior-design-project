@@ -54,8 +54,20 @@
               <h3 class="text-subtitle-1 font-weight-bold mb-1">Analysis Result</h3>
               <p><strong>Prediction:</strong> {{ result.prediction }}</p>
               <p><strong>Confidence:</strong> {{ result.confidence }}</p>
+              <v-btn
+                color="#7f73ef"
+                class="mt-1 text-caption px-3 py-2"
+                style="width: 130px; border-radius: 10px;"
+                v-if="result"
+                @click="$router.push({ name: 'PredictionDetails', params: { id: result.prediction_id } })"
+              >
+                View Details
+              </v-btn>
+
             </v-card>
           </div>
+
+          
         </v-fade-transition>
 
         <div v-if="error" class="mt-4 text-center">
@@ -219,7 +231,7 @@ export default {
 
 .upload-card {
   width: 80%; 
-  height: 850px;
+  height: 900px;
   max-width: 1200px;
   border-radius: 2rem;
   background: white;
@@ -260,7 +272,7 @@ export default {
   background-color: #f9f9ff;
   box-shadow: 0 8px 20px rgba(0,0,0,0.1);
   width: 100%;
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 .info-cards-container {
