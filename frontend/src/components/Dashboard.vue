@@ -32,6 +32,24 @@
           <input ref="fileInput" type="file" hidden accept="image/*" @change="handleFile" />
         </div>
 
+        <div class="model-selector mt-4 text-center">
+        <span class="selector-label">Choose Model:</span>
+        <v-btn-toggle v-model="selectedModelObject" mandatory>
+          <v-btn
+            v-for="option in modelOptions"
+            :key="option.value"
+            :value="option.value"
+            class="model-btn"
+            rounded
+            depressed
+            color="#f0f0ff"
+            :class="{ 'selected-btn': selectedModelObject === option.value }"
+          >
+            {{ option.label }}
+          </v-btn>
+        </v-btn-toggle>
+      </div>
+
         <v-btn
           v-if="filePreview && !loading"
           color="#b3a7f5"
@@ -53,7 +71,7 @@
               <v-icon size="36" color="#7f73ef" class="mb-2">mdi-brain</v-icon>
               <h3 class="text-subtitle-1 font-weight-bold mb-1">Analysis Result</h3>
               <p><strong>Prediction:</strong> {{ result.prediction }}</p>
-              <p><strong>Confidence:</strong> {{ result.confidence }}</p>
+              <p><strong>Confidence:</strong> {{ result.confidence.toFixed(1) }}%</p>
               <v-btn
                 color="#7f73ef"
                 class="mt-1 text-caption px-3 py-2"
@@ -79,12 +97,13 @@
         <v-card class="info-card pa-4 mb-4">
           <h3 class="card-title mb-2">Quick Tips</h3>
           <ul>
-            <li>Make sure your MRI image is clear and properly cropped. It should be of size <b>64x64</b>.</li>
+            <li>Make sure your MRI image is clear and properly cropped. It should be of size <b>64x64</b> for <b>CNN Model</b>, and <b>224x224</b> for <b>Transfer Learning Model</b>.</li>
             <li>The file should be of type <i>JPG</i> or <i>PNG</i>.</li>
             <li>File size should not exceed 10MB.</li>
             <li>Deep learning will analyze brain regions for early Alzheimer's detection and most likely dementia stage.</li>
             <li>Analysis will be completed in approximately 5–10 seconds, depending on server load.</li>
-            <li>Files are processed securely and will only be stored on your <i>Profile page</i>.</li>
+            <li>Files are processed securely and stored only on your <i>Profile page</i>. 
+          Click <b>View Details</b> to see the generated heatmap.</li>
           </ul>
         </v-card>
 
@@ -111,8 +130,14 @@ export default {
       result: null,
       error: null,
       loading: false,
+      selectedModelObject: "cnn", 
+      modelOptions: [
+        { label: "CNN (64x64)", value: "cnn" },
+        { label: "TL (224x224)", value: "transfer" }
+      ],
     };
   },
+
   methods: {
     handleDrop(e) {
       const file = e.dataTransfer.files[0];
@@ -143,6 +168,8 @@ export default {
       const formData = new FormData();
       formData.append("file", this.file);
       formData.append("user_id", localStorage.getItem("user_id"));
+      formData.append("model_type", this.selectedModelObject);
+
 
       try {
         const response = await axios.post("http://localhost:5001/predict", formData, {
@@ -221,6 +248,11 @@ export default {
   color: #b79df8;
 }
 
+.model-btn {
+  margin-right: 20px;
+  margin-left: 25px;
+}
+
 .hero-dashboard {
   display: flex;
   flex-direction: column;
@@ -231,7 +263,7 @@ export default {
 
 .upload-card {
   width: 80%; 
-  height: 900px;
+  height: 1000px;
   max-width: 1200px;
   border-radius: 2rem;
   background: white;
