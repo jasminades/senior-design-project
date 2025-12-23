@@ -24,4 +24,3 @@ technologies
   - frontend
       - Vue.js 3
       - Vuetify 3
-      - Axios
