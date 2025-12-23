@@ -172,14 +172,13 @@ export default {
 
 
       try {
-        const response = await axios.post("http://localhost:5001/predict", formData, {
+        const response = await axios.post("/predict", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         await new Promise((r) => setTimeout(r, 1500));
         this.result = response.data;
-      } catch (err) {
-        console.error(err);
-        this.error = err.response?.data?.error || "An error occurred during analysis.";
+      } catch  {
+        console.error("An error occurred during analysis.");
       } finally {
         this.loading = false;
       }
