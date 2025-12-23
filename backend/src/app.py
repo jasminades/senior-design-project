@@ -8,6 +8,7 @@ import tensorflow as tf
 from tensorflow.keras.preprocessing import image
 import mysql.connector
 
+
 db = mysql.connector.connect(
     host="localhost",
     user="root",
@@ -24,10 +25,11 @@ HEATMAP_FOLDER = "heatmaps"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(HEATMAP_FOLDER, exist_ok=True)
 
-CNN_MODEL_PATH = ""
+
+CNN_MODEL_PATH = "/cnn_model.keras"
 cnn_model = tf.keras.models.load_model(CNN_MODEL_PATH)
 
-TRANSFER_MODEL_PATH = ""
+TRANSFER_MODEL_PATH = "/transfer_model_finetune.keras"
 transfer_model = tf.keras.models.load_model(TRANSFER_MODEL_PATH)
 
 _ = cnn_model(np.zeros((1, 64, 64, 3), dtype=np.float32), training=False)
@@ -40,6 +42,7 @@ def generate_gradcam(model, img_array, last_conv_layer_name):
         inputs=model.inputs,
         outputs=last_conv_layer.output
     )
+
     classifier_input = tf.keras.Input(shape=last_conv_layer.output.shape[1:])
     x = classifier_input
     for layer in model.layers[model.layers.index(last_conv_layer)+1:]:
@@ -67,6 +70,8 @@ def generate_gradcam(model, img_array, last_conv_layer_name):
 
 @app.route("/predict", methods=["POST"])
 def predict():
+    print("Received model_type:", request.form.get("model_type"))
+
     try:
         if "file" not in request.files:
             return jsonify({"error": "No image uploaded"}), 400
@@ -98,6 +103,7 @@ def predict():
 
         if preds.shape[1] > 1:
             preds = tf.nn.softmax(preds, axis=1).numpy()
+
         preds = model.predict(img_array)
         if preds.shape[1] > 1:
             preds = tf.nn.softmax(preds, axis=1).numpy()
@@ -144,7 +150,6 @@ def predict():
         })
 
     except Exception as e:
-        print("ERROR:", e)
         return jsonify({"error": str(e)}), 500
 
 @app.route("/history/<int:user_id>", methods=["GET"])
